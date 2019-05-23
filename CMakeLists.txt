@@ -5,12 +5,62 @@ project(InitGL)
 # Source files
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libraries")
-set(SOURCES "${SRC_DIR}/main.cpp")
+set(SOURCES "${SRC_DIR}/main.cpp" source/Lesson1/Lesson1.cpp source/Lesson1/Lesson1.h source/ShaderReader/ShaderReader.cpp source/ShaderReader/ShaderReader.h)
 
 # Executable definition and properties
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${SHADERS_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}")
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
+
+# Add Boost
+find_package(Boost 1.69 COMPONENTS filesystem REQUIRED)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
+endif()
+
+## Add Shader and Fragment files
+#include_directories("${SRC_DIR}/Lesson1")
+#set(SHADERS_DIR "${SRC_DIR}/shaders")
+#set(CHAPTERS ${SRC_DIR}/Lesson1)
+#
+#foreach(CHAPTER ${CHAPTERS})
+#    file(GLOB SOURCE
+#            "${SRC_DIR}/${CHAPTER}/*.h"
+#            "${SRC_DIR}/${CHAPTER}/*.cpp"
+#            "${SRC_DIR}/${CHAPTER}/*.vert"
+#            "${SRC_DIR}/${CHAPTER}/*.frag"
+#            )
+#    set(NAME "${CHAPTER}")
+#    add_executable(${PROJECT_NAME} ${SOURCE})
+#    target_link_libraries(${NAME} ${LIBS})
+#    if(WIN32)
+#        set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/${CHAPTER}")
+#    elseif(UNIX AND NOT APPLE)
+#        set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}")
+#    elseif(APPLE)
+#        set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}")
+#        set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}")
+#        set_target_properties(${NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}")
+#    endif(WIN32)
+#
+#    file(GLOB SHADERS
+#            "${SRC_DIR}/${CHAPTER}/*.vert"
+#            "${SRC_DIR}/${CHAPTER}/*.frag"
+#            )
+#    foreach(SHADER ${SHADERS})
+#        if(WIN32)
+#            # configure_file(${SHADER} "test")
+#            add_custom_command(TARGET ${NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SHADER} $<TARGET_FILE_DIR:${NAME}>)
+#        elseif(UNIX AND NOT APPLE)
+#            file(COPY ${SHADER} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER})
+#        elseif(APPLE)
+#            # create symbolic link for *.vs *.fs *.gs
+#            get_filename_component(SHADERNAME ${SHADER} NAME)
+#            makeLink(${SHADER} ${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER}/${SHADERNAME} ${NAME})
+#        endif(WIN32)
+#    endforeach(SHADER)
+#endforeach(CHAPTER)
 
 # GLFW
 set(GLFW_DIR "${LIB_DIR}/glfw")
