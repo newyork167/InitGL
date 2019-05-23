@@ -2,6 +2,8 @@
 cmake_minimum_required(VERSION 3.1)
 project(InitGL)
 
+message(STATUS ${CMAKE_CURRENT_BINARY_DIR})
+
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/shaders")
 
 # Source files
@@ -9,10 +11,10 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libraries")
 #set(SOURCES "${SRC_DIR}/main.cpp" source/Lesson1/Lesson1.cpp source/Lesson1/Lesson1.h source/ShaderReader/ShaderReader.cpp source/ShaderReader/ShaderReader.h)
 file(GLOB_RECURSE SOURCES
-    "${SRC_DIR}/*.h"
-    "${SRC_DIR}/*.cpp"
-    "${SRC_DIR}/*.vert"
-    "${SRC_DIR}/*.frag"
+    ${SRC_DIR}/*.h
+    ${SRC_DIR}/*.cpp
+    ${SRC_DIR}/*.vert
+    ${SRC_DIR}/*.frag
 )
 
 # Executable definition and properties
@@ -21,11 +23,29 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}")
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 
 # Add Boost
-find_package(Boost 1.69 COMPONENTS filesystem REQUIRED)
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
-endif()
+#set(Boost_DEBUG 1)
+#if(WIN32)
+#	set(Boost_USE_STATIC_LIBS ON)
+#	set(Boost_USE_MULTITHREADED ON)
+#	set(Boost_USE_STATIC_RUNTIME ON)
+#
+#	set(WIN32_LIBRARIES_PATH "C:/Boost")
+#	set(BOOST_ROOT ${WIN32_LIBRARIES_PATH}/include/boost-1_64)
+#	set(BOOST_LIBRARYDIR ${WIN32_LIBRARIES_PATH}/lib)
+#endif(WIN32)
+#
+#find_package(
+#	Boost 1.64
+#	COMPONENTS 
+#		filesystem
+#)
+#if(Boost_FOUND)
+#	message(STATUS "Boost framework was found!")
+#    include_directories(${Boost_INCLUDE_DIRS})
+#    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
+#elseif()
+#	message(STATUS "Could not find Boost framework")
+#endif(Boost_FOUND)
 
 # GLFW
 set(GLFW_DIR "${LIB_DIR}/glfw")
@@ -57,8 +77,9 @@ file(GLOB_RECURSE SHADERS
 foreach(SHADER ${SHADERS})
     message(${SHADER})
     if(WIN32)
-        # configure_file(${SHADER} "test")
-        add_custom_command(TARGET ${NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SHADER} $<TARGET_FILE_DIR:${NAME}>)
+        get_filename_component(SHADERNAME ${SHADER} NAME)
+        message(STATUS ${SHADERNAME})
+		configure_file(${SHADER} ${CMAKE_CURRENT_BINARY_DIR}/shaders/${SHADERNAME} COPYONLY)
     elseif(UNIX AND NOT APPLE)
         file(COPY ${SHADER} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/shaders/)
     elseif(APPLE)

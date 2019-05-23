@@ -8,14 +8,7 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <fstream>
-#include <boost/filesystem.hpp>
-#include <boost/range/iterator_range.hpp>
 #include <string>
-#include <vector>
-#include <algorithm>
-#include <iterator>
-
-typedef std::vector<std::string> stringvec;
 
 class ShaderReader {
 public:

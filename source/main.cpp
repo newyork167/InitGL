@@ -1,6 +1,4 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <stdio.h>
+#include "main.h"
 
 bool displayWireframeMode = false;
 bool wKeyHeld = false;
@@ -20,6 +18,7 @@ namespace {
       glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
       glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
       glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	  glfwWindowHint(GLFW_REFRESH_RATE, 120);
 
 #ifdef __APPLE__
        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
@@ -71,8 +70,15 @@ void processInput(GLFWwindow *window)
     }
 }
 
-void render() {
+void render(Testing* shader) {
     // Write main render code here
+	// Set the u_time uniform for shaders
+	int vertexColorLocation = glGetUniformLocation(shader->get_shader_program(), "u_time");
+	glUniform1f(vertexColorLocation, shader->get_time_since_start());
+
+	glUseProgram(shader->get_shader_program());
+	glBindVertexArray(shader->get_vao());
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 int main(int argc, char* argv[]) {
@@ -88,12 +94,17 @@ int main(int argc, char* argv[]) {
     // Set the clear color to a nice green
     glClearColor(0.15f, 0.6f, 0.4f, 1.0f);
 
+	// Set your ShaderInterface here
+	auto shader = Testing();
+	time_t start = time(0);
+
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
+		shader.set_time_since_start(difftime(time(0), start)/10);
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        render();
+        render(&shader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
