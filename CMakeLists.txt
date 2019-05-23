@@ -2,6 +2,8 @@
 cmake_minimum_required(VERSION 3.1)
 project(InitGL)
 
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/shaders")
+
 # Source files
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libraries")
@@ -58,10 +60,10 @@ foreach(SHADER ${SHADERS})
         # configure_file(${SHADER} "test")
         add_custom_command(TARGET ${NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SHADER} $<TARGET_FILE_DIR:${NAME}>)
     elseif(UNIX AND NOT APPLE)
-        file(COPY ${SHADER} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin/${CHAPTER})
+        file(COPY ${SHADER} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/shaders/)
     elseif(APPLE)
         # create symbolic link for *.vs *.fs *.gs
         get_filename_component(SHADERNAME ${SHADER} NAME)
-        makeLink(${SHADER} ${CMAKE_CURRENT_BINARY_DIR}/${SHADERNAME} ${PROJECT_NAME})
+        makeLink(${SHADER} ${CMAKE_CURRENT_BINARY_DIR}/shaders/${SHADERNAME} ${PROJECT_NAME})
     endif(WIN32)
 endforeach(SHADER)

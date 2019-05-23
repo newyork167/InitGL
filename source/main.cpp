@@ -1,7 +1,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <stdio.h>
+
+bool displayWireframeMode = false;
+bool wKeyHeld = false;
 
 namespace {
    void errorCallback(int error, const char* description) {
@@ -18,7 +20,10 @@ namespace {
       glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
       glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
       glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-      glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+#ifdef __APPLE__
+       glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // uncomment this statement to fix compilation on OS X
+#endif
 
       GLFWwindow* window = glfwCreateWindow(1280, 720, "InitGL", nullptr, nullptr);
       if (!window) {
@@ -41,26 +46,61 @@ namespace {
    }
 }
 
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+}
+
+// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// ---------------------------------------------------------------------------------------------------------
+void processInput(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+    else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !wKeyHeld) {
+        displayWireframeMode = !displayWireframeMode;
+        glPolygonMode(GL_FRONT_AND_BACK, displayWireframeMode ? GL_LINE : GL_FILL);
+        wKeyHeld = true;
+    } else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE) {
+        wKeyHeld = false;
+    }
+}
+
+void render() {
+    // Write main render code here
+}
+
 int main(int argc, char* argv[]) {
-   glfwSetErrorCallback(errorCallback);
+    glfwSetErrorCallback(errorCallback);
 
-   GLFWwindow* window = initialize();
-   if (!window) {
-      return 0;
-   }
+    GLFWwindow* window = initialize();
+    if (!window) {
+        return 0;
+    }
 
-   // Set the clear color to a nice green
-   glClearColor(0.15f, 0.6f, 0.4f, 1.0f);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-   while (!glfwWindowShouldClose(window)) {
-      glClear(GL_COLOR_BUFFER_BIT);
+    // Set the clear color to a nice green
+    glClearColor(0.15f, 0.6f, 0.4f, 1.0f);
 
-      glfwSwapBuffers(window);
-      glfwPollEvents();
-   }
+    while (!glfwWindowShouldClose(window)) {
+        processInput(window);
 
-   glfwDestroyWindow(window);
-   glfwTerminate();
+        glClear(GL_COLOR_BUFFER_BIT);
 
-   return 0;
+        render();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
+    return 0;
 }
