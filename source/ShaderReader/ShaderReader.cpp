@@ -12,19 +12,22 @@ struct path_leaf_string
     }
 };
 
-void ShaderReader::read_directory(const std::string& name, stringvec& v)
+void ShaderReader::read_directory(const std::string& parentDirectory)
 {
-    boost::filesystem::path p(name);
-    boost::filesystem::directory_iterator start(p);
-    boost::filesystem::directory_iterator end;
-    std::transform(start, end, std::back_inserter(v), path_leaf_string());
+    namespace fs = boost::filesystem;
+    fs::path dir = parentDirectory;
+    fs::recursive_directory_iterator it(dir), end;
+
+    std::vector<std::string> files;
+    for (auto& entry : boost::make_iterator_range(it, end))
+        if (is_regular(entry))
+            files.push_back(entry.path().native());
+
+    for (auto& file : files)
+        std::cout << file << "\n";
 }
 
 const GLchar *ShaderReader::ReadFromFile(const GLchar *pathToFile) {
-    stringvec v;
-    ShaderReader::read_directory(".", v);
-    std::copy(v.begin(), v.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
-
     std::string content;
     std::ifstream fileStream(pathToFile, std::ios::in);
 

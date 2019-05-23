@@ -9,6 +9,7 @@
 #include <glad/glad.h>
 #include <fstream>
 #include <boost/filesystem.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -20,7 +21,7 @@ class ShaderReader {
 public:
     static const GLchar* ReadFromFile(const GLchar* pathToFile);
 private:
-    static void read_directory(const std::string& name, stringvec& v);
+    static void read_directory(const std::string& parentDirectory);
 
 };
 
