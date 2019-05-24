@@ -9,8 +9,11 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <time.h>
+#include <vector>
+#include <numeric>
+#include <functional>
 
 // Add further includes here
-#include <Testing/testing.h>
+#include <Testing/testing.h> 
 
 #endif // INITGL_MAIN_H

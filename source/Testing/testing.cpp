@@ -6,17 +6,17 @@ Testing::Testing()
 	this->vao = this->setup_vao();
 }
 
-unsigned int Testing::setup_vao()
+GLint Testing::setup_vao()
 {
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
-	float vertices[] = {
+	GLfloat vertices[] = {
 		 0.5f,  0.5f, 0.0f,  // top right
 		 0.5f, -0.5f, 0.0f,  // bottom right
 		-0.5f, -0.5f, 0.0f,  // bottom left
 		-0.5f,  0.5f, 0.0f   // top left 
 	};
-	unsigned int indices[] = {  // note that we start from 0!
+	GLint indices[] = {  // note that we start from 0!
 		0, 1, 3,  // first Triangle
 		1, 2, 3   // second Triangle
 	};
@@ -49,7 +49,7 @@ unsigned int Testing::setup_vao()
 	return VAO;
 }
 
-unsigned int Testing::setup_shader_program()
+GLint Testing::setup_shader_program()
 {
 	const GLchar *fragmentShaderSource = ShaderReader::ReadFromFile("shaders/testing.frag");
 	const GLchar *vertexShaderSource = ShaderReader::ReadFromFile("shaders/testing.vert");
@@ -97,12 +97,12 @@ unsigned int Testing::setup_shader_program()
 	return shaderProgram;
 }
 
-unsigned int Testing::get_shader_program()
+GLint Testing::get_shader_program()
 {
 	return this->shader_program;
 }
 
-unsigned int Testing::get_vao()
+GLint Testing::get_vao()
 {
 	return this->vao;
 }

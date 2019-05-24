@@ -54,31 +54,67 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	GLint id;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &id);
+	GLint u_mouse_dot_product = glGetUniformLocation(id, "u_mouse_dot_product");
+	std::vector<int> x = {(int)xpos , 0 , 0}, y = { (int)ypos, 0, 0};
+	glUniform1f(u_mouse_dot_product, std::inner_product(x.begin(), x.end(), y.begin(), 0));
+
+	GLint u_mouse_x = glGetUniformLocation(id, "u_mouse_x");
+	glUniform1f(u_mouse_x, xpos);
+
+	GLint u_mouse_y = glGetUniformLocation(id, "u_mouse_y");
+	glUniform1f(u_mouse_y, ypos);
+
+	std::cout << "Cursor Position at (" << xpos << " : " << ypos << std::endl;
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+	{
+		double xpos, ypos;
+		//getting cursor position
+		glfwGetCursorPos(window, &xpos, &ypos);
+		std::cout << "Cursor Position at (" << xpos << " : " << ypos << std::endl;
+	}
+}
+
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
+void process_keyboard_input(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
-    else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !wKeyHeld) {
+    else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !wKeyHeld) 
+	{
         displayWireframeMode = !displayWireframeMode;
         glPolygonMode(GL_FRONT_AND_BACK, displayWireframeMode ? GL_LINE : GL_FILL);
         wKeyHeld = true;
-    } else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE) {
+    } 
+	else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE) 
+	{
         wKeyHeld = false;
+    } 
+	else if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+    {
+	    
     }
 }
 
 void render(Testing* shader) {
     // Write main render code here
 	// Set the u_time uniform for shaders
-	int vertexColorLocation = glGetUniformLocation(shader->get_shader_program(), "u_time");
-	glUniform1f(vertexColorLocation, shader->get_time_since_start());
+	GLint u_time = glGetUniformLocation(shader->get_shader_program(), "u_time");
+	glUniform1f(u_time, shader->get_time_since_start());
 
 	glUseProgram(shader->get_shader_program());
 	glBindVertexArray(shader->get_vao());
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 2);
 }
 
 int main(int argc, char* argv[]) {
@@ -89,7 +125,9 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, cursor_position_callback);
 
     // Set the clear color to a nice green
     glClearColor(0.15f, 0.6f, 0.4f, 1.0f);
@@ -99,8 +137,8 @@ int main(int argc, char* argv[]) {
 	time_t start = time(0);
 
     while (!glfwWindowShouldClose(window)) {
-        processInput(window);
-		shader.set_time_since_start(difftime(time(0), start)/10);
+		process_keyboard_input(window);
+		shader.set_time_since_start(difftime(time(0), start));
 
         glClear(GL_COLOR_BUFFER_BIT);
 
