@@ -14,12 +14,12 @@ class Testing : public ShaderInterface
     // Interface level functions/variables
 public:
 	Testing();
-	unsigned int get_vao() override;
-	unsigned int get_shader_program() override;
+	GLint get_vao() override;
+    GLint get_shader_program() override;
     void render() override;
 private:
-	unsigned int setup_vao() override;
-	unsigned int setup_shader_program() override;
+    GLint setup_vao() override;
+    GLint setup_shader_program() override;
 
 	// Implementation Level Functions
 public:

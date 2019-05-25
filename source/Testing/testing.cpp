@@ -27,7 +27,7 @@ Testing::Testing()
 	this->start_time = std::chrono::system_clock::now();
 }
 
-unsigned int Testing::setup_vao()
+GLint Testing::setup_vao()
 {
     float shift = this->get_time_since_start();
 	// set up vertex data (and buffer(s)) and configure vertex attributes
@@ -71,7 +71,7 @@ unsigned int Testing::setup_vao()
 	return VAO;
 }
 
-unsigned int Testing::setup_shader_program()
+GLint Testing::setup_shader_program()
 {
 	const GLchar *fragmentShaderSource = ShaderReader::ReadFromFile("shaders/testing.frag");
 	const GLchar *vertexShaderSource = ShaderReader::ReadFromFile("shaders/testing.vert");
