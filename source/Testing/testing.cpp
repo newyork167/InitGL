@@ -1,21 +1,43 @@
 #include <Testing/testing.h>
 
+unsigned int Testing::get_shader_program()
+{
+    return this->shader_program;
+}
+
+unsigned int Testing::get_vao()
+{
+    return this->vao;
+}
+
+double Testing::get_time_since_start()
+{
+    return this->time_since_start;
+}
+
+void Testing::set_time_since_start(double time_since_start)
+{
+    this->time_since_start = time_since_start;
+}
+
 Testing::Testing()
 {
 	this->shader_program = this->setup_shader_program();
 	this->vao = this->setup_vao();
+	this->start_time = std::chrono::system_clock::now();
 }
 
 unsigned int Testing::setup_vao()
 {
+    float shift = this->get_time_since_start();
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
-	float vertices[] = {
-		 0.5f,  0.5f, 0.0f,  // top right
-		 0.5f, -0.5f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f   // top left 
-	};
+    float vertices[] = {
+            fmod(0.5f + shift, 1.0f),  fmod(0.5f + shift, 1.0f), fmod(0.0f + shift, 1.0f),  // top right
+            fmod(0.5f + shift, 1.0f), fmod(-0.5f + shift, 1.0f), fmod(0.0f + shift, 1.0f),  // bottom right
+            fmod(-0.5f + shift, 1.0f), fmod(-0.5f + shift, 1.0f), fmod(0.0f + shift, 1.0f),  // bottom left
+            fmod(-0.5f + shift, 1.0f), fmod( 0.5f + shift, 1.0f), fmod(0.0f + shift, 1.0f)   // top left
+    };
 	unsigned int indices[] = {  // note that we start from 0!
 		0, 1, 3,  // first Triangle
 		1, 2, 3   // second Triangle
@@ -58,7 +80,7 @@ unsigned int Testing::setup_shader_program()
 	// ------------------------------------
 	// vertex shader
 	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
 	glCompileShader(vertexShader);
 	// check for shader compile errors
 	int success;
@@ -66,18 +88,18 @@ unsigned int Testing::setup_shader_program()
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+		glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
 	// fragment shader
 	int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
 	glCompileShader(fragmentShader);
 	// check for shader compile errors
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+		glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
 	// link shaders
@@ -88,7 +110,7 @@ unsigned int Testing::setup_shader_program()
 	// check for linking errors
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+		glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
 		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
 	}
 	glDeleteShader(vertexShader);
@@ -97,22 +119,16 @@ unsigned int Testing::setup_shader_program()
 	return shaderProgram;
 }
 
-unsigned int Testing::get_shader_program()
+void Testing::render()
 {
-	return this->shader_program;
-}
+    test_clock current_time = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = current_time - this->start_time;
+    this->set_time_since_start(elapsed_seconds.count() * 50);
+    double radians = (this->get_time_since_start() * 3.1415926535897932384626433832795) / 180;
+    std::cout << "Current radians: " << radians << std::endl;
+    glUniform1f(glGetUniformLocation(this->get_shader_program(), "u_time"), radians);
 
-unsigned int Testing::get_vao()
-{
-	return this->vao;
-}
-
-double Testing::get_time_since_start()
-{
-	return this->time_since_start;
-}
-
-void Testing::set_time_since_start(double time_since_start)
-{
-	this->time_since_start = time_since_start;
+    glUseProgram(this->get_shader_program());
+    glBindVertexArray(this->get_vao());
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

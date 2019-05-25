@@ -70,17 +70,6 @@ void processInput(GLFWwindow *window)
     }
 }
 
-void render(Testing* shader) {
-    // Write main render code here
-	// Set the u_time uniform for shaders
-	int vertexColorLocation = glGetUniformLocation(shader->get_shader_program(), "u_time");
-	glUniform1f(vertexColorLocation, shader->get_time_since_start());
-
-	glUseProgram(shader->get_shader_program());
-	glBindVertexArray(shader->get_vao());
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-}
-
 int main(int argc, char* argv[]) {
     glfwSetErrorCallback(errorCallback);
 
@@ -96,15 +85,13 @@ int main(int argc, char* argv[]) {
 
 	// Set your ShaderInterface here
 	auto shader = Testing();
-	time_t start = time(0);
 
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
-		shader.set_time_since_start(difftime(time(0), start)/10);
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        render(&shader);
+        shader.render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

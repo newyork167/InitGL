@@ -1,5 +1,7 @@
 #version 330 core
-out vec4 gl_FragColor;
+out vec4 FragColor;
+
+const float PI = 3.1415926535897932384626433832795;
 
 #ifdef GL_ES
 precision mediump float;
@@ -15,5 +17,5 @@ float random (vec2 st) {
 
 void main()
 {
-	gl_FragColor = vec4(sin(u_time), cos(u_time), 0.0, 1.0);
+    FragColor = vec4(sin(u_time), cos(u_time), cos(u_time), 1.0);
 }

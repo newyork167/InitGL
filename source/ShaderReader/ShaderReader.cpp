@@ -20,7 +20,7 @@ const GLchar *ShaderReader::ReadFromFile(const GLchar *pathToFile) {
     }
 
     fileStream.close();
-    std::cout << "'" << content << "'" << std::endl;
+//    std::cout << "'" << content << "'" << std::endl;
 
     auto * source = new char[content.length()+1];
     strcpy(source, content.c_str());

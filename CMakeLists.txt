@@ -23,29 +23,29 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${SRC_DIR}")
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
 
 # Add Boost
-#set(Boost_DEBUG 1)
-#if(WIN32)
-#	set(Boost_USE_STATIC_LIBS ON)
-#	set(Boost_USE_MULTITHREADED ON)
-#	set(Boost_USE_STATIC_RUNTIME ON)
-#
-#	set(WIN32_LIBRARIES_PATH "C:/Boost")
-#	set(BOOST_ROOT ${WIN32_LIBRARIES_PATH}/include/boost-1_64)
-#	set(BOOST_LIBRARYDIR ${WIN32_LIBRARIES_PATH}/lib)
-#endif(WIN32)
-#
-#find_package(
-#	Boost 1.64
-#	COMPONENTS 
-#		filesystem
-#)
-#if(Boost_FOUND)
-#	message(STATUS "Boost framework was found!")
-#    include_directories(${Boost_INCLUDE_DIRS})
-#    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
-#elseif()
-#	message(STATUS "Could not find Boost framework")
-#endif(Boost_FOUND)
+set(Boost_DEBUG 1)
+if(WIN32)
+	set(Boost_USE_STATIC_LIBS ON)
+	set(Boost_USE_MULTITHREADED ON)
+	set(Boost_USE_STATIC_RUNTIME ON)
+
+	set(WIN32_LIBRARIES_PATH "C:/Boost")
+	set(BOOST_ROOT ${WIN32_LIBRARIES_PATH}/include/boost-1_64)
+	set(BOOST_LIBRARYDIR ${WIN32_LIBRARIES_PATH}/lib)
+endif(WIN32)
+
+find_package(
+	Boost 1.64
+	COMPONENTS
+		filesystem
+)
+if(Boost_FOUND)
+	message(STATUS "Boost framework was found!")
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
+elseif()
+	message(STATUS "Could not find Boost framework")
+endif(Boost_FOUND)
 
 # GLFW
 set(GLFW_DIR "${LIB_DIR}/glfw")
